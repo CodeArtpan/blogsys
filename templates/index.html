@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>index</title>
+    <link rel="stylesheet" href="/static/bootstrap/css/bootstrap.css">
+    <link rel="stylesheet" href="/static/mycss/commons.css">
+</head>
+<body>
+
+
+<nav class="navbar navbar-default no-radius">
+    <div class="container">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <a class="navbar-brand" href="#">老子的技术论坛</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav">
+                {% if type_id %}
+                    <li><a href="/all">All <span class="sr-only">(current)</span></a></li>
+                {% else %}
+                    <li class="active"><a href="/all">All <span class="sr-only">(current)</span></a></li>
+                {% endif %}
+
+                {% for item in type_choices_list %}
+                    {% if item.0 == type_id %}
+                        <li class="active"><a href="/all/{{ item.0 }}">{{ item.1 }}</a></li>
+                    {% else %}
+                        <li><a href="/all/{{ item.0 }}">{{ item.1 }}</a></li>
+                    {% endif %}
+
+                {% endfor %}
+            </ul>
+
+            <ul class="nav navbar-nav navbar-right">
+                {% if request.session.user %}
+                    <li><a href="#">hello {{ request.session.user }}</a></li>
+                    <li><a href="/logout">注销</a></li>
+                {% else %}
+                    <li><a href="/login">登录</a></li>
+                    <li><a href="/reg">注册</a></li>
+                {% endif %}
+            </ul>
+        </div><!-- /.navbar-collapse -->
+    </div><!-- /.container-fluid -->
+</nav>
+
+<div class="container">
+    <div class="col-md-8">
+        <div class="article-list">
+
+            <div class="article-item">
+                <div class="art-head"><a href="#">php是世界上最好的语言</a></div>
+                <div class="art-body clearfix">
+                    <a href="" class="left"><img src="/static/avatar/cat.jpeg" alt=""></a>
+                    作为阿里巴巴A100首批战略合作伙伴，红蜻蜓、雅戈尔等与阿里云合作建设数据中台、智慧门店等，在今年天猫双11中创下佳绩。红蜻蜓全渠道单品牌销售额突破3.8亿，位列鞋品牌榜第四。雅戈尔全网销售额1.24亿，同比增长88.8%。
+                </div>
+                <div class="art-foot">
+                    <a href="">peter</a>
+                    <a href="">点赞(2)</a>
+                </div>
+            </div>
+
+            {% for article in pg_art_list %}
+                <div class="article-item">
+                    <div class="art-head"><a href="#">{{ article.title }}</a></div>
+                    <div class="art-body clearfix">
+                        <a href="" class="left"><img src="{{ article.blog.user.avatar }}" alt=""></a>
+                        {{ article.summary }}
+                    </div>
+                    <div class="art-foot">
+                        <a href="">{{ article.blog.user.username }}</a>
+                        <a href="">{{ article.up_count }}</a>
+                    </div>
+                </div>
+            {% endfor %}
+
+
+        </div>
+    </div>
+
+    <div class="col-md-4">
+
+        <div class="panel panel-primary">
+            <div class="panel-body">
+                Panel content
+            </div>
+            <div class="panel-body">
+                Panel content
+            </div>
+            <div class="panel-body">
+                Panel content
+            </div>
+        </div>
+
+        <div class="panel panel-success">
+            <div class="panel-body">
+                Panel content
+            </div>
+            <div class="panel-body">
+                Panel content
+            </div>
+            <div class="panel-body">
+                Panel content
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="container pg">
+    <div class="col-md-6 col-md-offset-3">
+        <nav aria-label="Page navigation">
+            <ul class="pagination">
+
+                {% if pg_art_list.has_previous %}
+                    <li><a href="?pg={{ pg_art_list.previous_page_number }}">上一页</a></li>
+                {% else %}
+                    <li class="disabled"><a>上一页</a></li>
+                {% endif %}
+
+
+                {% for page in page_list %}
+                    <li><a href="?pg={{ page }}">{{ page }}</a></li>
+                {% endfor %}
+
+                {% if pg_art_list.has_next %}
+                    <li><a href="?pg={{ pg_art_list.next_page_number }}">下一页</a></li>
+                {% else %}
+                    <li class="disabled"><a>下一页</a></li>
+                {% endif %}
+
+            </ul>
+        </nav>
+    </div>
+</div>
+
+</body>
+</html>

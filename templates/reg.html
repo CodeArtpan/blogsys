@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>注册页面</title>
+    <link rel="stylesheet" href="/static/bootstrap/css/bootstrap.css">
+    <link rel="stylesheet" href="/static/mycss/commons.css">
+    <script src="/static/jquery-3.4.1.min.js"></script>
+</head>
+<body>
+<div class="container log">
+    <div class="col-md-6 col-md-offset-3">
+        <form class="form-horizontal" method="post">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label for="id_user" class="col-sm-2 control-label">用户名</label>
+                <div class="col-sm-10">
+                    {{ reg_form.user }} <span id="user_error"></span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="id_password" class="col-sm-2 control-label">密码</label>
+                <div class="col-sm-10">
+                    {{ reg_form.password }} <span></span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="id_repeat_password" class="col-sm-2 control-label">重复密码</label>
+                <div class="col-sm-10">
+                    {{ reg_form.repeat_password }} <span id="repeat_error"></span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="id_email" class="col-sm-2 control-label">邮箱</label>
+                <div class="col-sm-10">
+                    {{ reg_form.email }} <span></span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="avatar" class="col-sm-2 control-label">头像</label>
+                <div class="col-sm-10">
+                    <img src="/static/avatar/default.jpg" id="default_img">
+                    <input type="file" id="avatar">
+                </div>
+            </div>
+
+            <div class="form-group" style="margin-top: 50px">
+                <label for="id_code" class="col-sm-2 control-label">验证码</label>
+                <div class="col-sm-5">
+                    {{ reg_form.code }} <span></span>
+                </div>
+                <img src="/produce_code" alt="auth_code" class="auth_code">
+                <span>{{ err.code }}</span>
+            </div>
+
+            <div class="form-group">
+                <div class="col-sm-offset-2 col-sm-10">
+                    <input type="button" class="btn btn-default register" value="注册">
+                    <span class="error"></span>
+                </div>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+<script>
+
+    $('.auth_code').click(function () {
+        $(this)[0].src += '?'
+    });
+
+    $('.register').click(function () {
+        var user = $('#id_user').val();
+        var password = $('#id_password').val();
+        var repeat_password = $('#id_repeat_password').val();
+        var email = $('#id_email').val();
+        var avatar_obj = $('#avatar')[0].files[0];
+        var code = $('#id_code').val();
+        var csrf = $('[name="csrfmiddlewaretoken"]').val();
+
+        var formdata = new FormData();
+        formdata.append('user', user);
+        formdata.append('password', password);
+        formdata.append('repeat_password', repeat_password);
+        formdata.append('email', email);
+        formdata.append('avatar', avatar_obj);
+        formdata.append('code', code);
+        formdata.append('csrfmiddlewaretoken', csrf);
+
+        $.ajax({
+            url: '/reg',
+            type: 'POST',
+            data: formdata,
+            contentType: false,
+            processData: false,
+            success: function (data) {
+                data = JSON.parse(data);
+                if (data.flag) {
+                    location.href = '/login'
+                } else {
+                    if (data.user_error) {
+                        $('#user_error').text(data.user_error).css('color', 'red')
+                    } else {
+                        error = data.error;
+                        for (var i in error) {
+                            if (i == '__all__') {
+                                $('#repeat_error').text(error[i]).css('color', 'red')
+                            } else {
+                                $('#id_' + i).next().text(error[i]).css('color', 'red')
+                            }
+                        }
+                    }
+                }
+
+            }
+        })
+    });
+
+    //头像预览
+    $('#avatar').change(function () {
+
+        var reader = new FileReader();
+        var upload_file = $(this)[0].files[0];
+        reader.readAsDataURL(upload_file);
+
+        reader.onload = function () {
+            $('#default_img')[0].src = this.result;
+        }
+    })
+</script>
+</body>
+</html>
